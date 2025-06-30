@@ -11,7 +11,9 @@ const useIsMobile = () => {
 
   useEffect(() => {
     const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+      const mobile = window.innerWidth < 1024; // lg breakpoint
+      console.log('📱 Screen width:', window.innerWidth, 'isMobile:', mobile);
+      setIsMobile(mobile);
     };
 
     checkIsMobile();
@@ -32,6 +34,9 @@ export const DashboardPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  console.log('🎯 DashboardPage render - postId:', postId, 'isMobile:', isMobile);
+  console.log('🎯 Posts loaded:', posts.length);
+
   // Fetch posts for dashboard
   const fetchPosts = async () => {
     try {
@@ -39,10 +44,10 @@ export const DashboardPage: React.FC = () => {
       setError(null);
       const response = await feedService.getFeedPosts();
       setPosts(response.posts || []);
-      console.log('DashboardPage fetched posts:', response.posts?.length || 0, 'posts');
-      console.log('Post IDs:', response.posts?.map(p => p._id || p.id) || []);
+      console.log('📊 DashboardPage fetched posts:', response.posts?.length || 0, 'posts');
+      console.log('📊 Post IDs:', response.posts?.map(p => p._id || p.id) || []);
     } catch (error: any) {
-      console.error('API error fetching posts:', error);
+      console.error('❌ API error fetching posts:', error);
       setError(error.response?.data?.message || 'Failed to load posts. Please try again.');
       setPosts([]);
     } finally {
@@ -51,62 +56,72 @@ export const DashboardPage: React.FC = () => {
   };
 
   useEffect(() => {
+    console.log('🔄 Fetching posts on mount...');
     fetchPosts();
   }, []);
 
   // Handle post modal based on URL - only for desktop
   useEffect(() => {
+    console.log('🔍 Post modal useEffect - isMobile:', isMobile, 'postId:', postId, 'posts.length:', posts.length);
+    
     // Only show modal on desktop screens
     if (!isMobile) {
-      console.log('DashboardPage useEffect - postId:', postId);
-      console.log('Available posts:', posts.map(p => p._id || p.id));
+      console.log('💻 Desktop mode - handling modal');
+      console.log('💻 DashboardPage useEffect - postId:', postId);
+      console.log('💻 Available posts:', posts.map(p => p._id || p.id));
       
       if (postId && posts.length > 0) {
         const post = posts.find(p => (p._id || p.id) === postId);
-        console.log('Found post:', post);
+        console.log('💻 Found post:', post);
         
         if (post) {
           setSelectedPost(post);
           setCurrentPostIndex(posts.indexOf(post));
-          console.log('Post set, currentPostIndex:', posts.indexOf(post));
+          console.log('💻 Post set, currentPostIndex:', posts.indexOf(post));
         } else {
-          console.log('Post not found, redirecting to dashboard');
+          console.log('💻 Post not found, redirecting to dashboard');
           // Post not found, redirect to dashboard
           navigate('/dashboard', { replace: true });
         }
       } else if (!postId) {
-        console.log('No postId, clearing selected post');
+        console.log('💻 No postId, clearing selected post');
         setSelectedPost(null);
         setCurrentPostIndex(-1);
       }
     } else {
+      console.log('📱 Mobile mode - checking for redirect');
       // On mobile, if there's a postId in dashboard route, redirect to dedicated post page
       if (postId) {
+        console.log('📱 Mobile redirect to /post/' + postId);
         navigate(`/post/${postId}`, { replace: true });
       }
     }
   }, [postId, navigate, posts, isMobile]);
 
   const handlePostClick = (post: Post) => {
-    console.log('Post clicked:', post.id || post._id);
-    console.log('Full post object:', post);
-    console.log('Post _id:', post._id);
-    console.log('Post keys:', Object.keys(post));
+    console.log('🖱️ Post clicked:', post.id || post._id);
+    console.log('🖱️ Full post object:', post);
+    console.log('🖱️ Post _id:', post._id);
+    console.log('🖱️ Post keys:', Object.keys(post));
+    console.log('🖱️ isMobile:', isMobile);
     
     // Use _id for API posts, id for mock posts
     const postId = post._id || post.id;
-    console.log('Using postId:', postId);
+    console.log('🖱️ Using postId:', postId);
     
     if (postId) {
       if (isMobile) {
-        // On mobile, navigate to dedicated post page
-        navigate(`/post/${postId}`);
+        console.log('📱 Mobile navigation to /post/' + postId);
+        console.log('📱 Passing post in state:', post.title);
+        // On mobile, navigate to dedicated post page and pass post data in state
+        navigate(`/post/${postId}`, { state: { post } });
       } else {
+        console.log('💻 Desktop navigation to /dashboard/post/' + postId);
         // On desktop, show modal by updating URL
         navigate(`/dashboard/post/${postId}`, { replace: false });
       }
     } else {
-      console.error('No valid ID found for post:', post);
+      console.error('❌ No valid ID found for post:', post);
     }
   };
 
