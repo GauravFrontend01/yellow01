@@ -8,10 +8,9 @@ interface PostCardProps {
   post: Post;
   onEdit?: () => void;
   onClick?: () => void;
-  imageDimensions?: { width: number; height: number };
 }
 
-export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick, imageDimensions }) => {
+export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick }) => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
   const [isLiked, setIsLiked] = useState(post.isLiked || false);
@@ -30,15 +29,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick, image
   const comments = post.comments || 0;
   const postId = post._id || post.id;
 
-  // Calculate image aspect ratio for better display
-  const getImageStyle = () => {
-    if (!imageDimensions) {
-      return { aspectRatio: '1' }; // Default square until loaded
-    }
-    
-    const aspectRatio = imageDimensions.width / imageDimensions.height;
-    return { aspectRatio: aspectRatio.toString() };
-  };
+
 
   const handleLike = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -122,12 +113,11 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick, image
       onClick={onClick}
     >
       {/* Post Image */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden rounded-t-2xl">
         <img
           src={imageUrl}
           alt={title}
-          className="w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          style={getImageStyle()}
+          className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
