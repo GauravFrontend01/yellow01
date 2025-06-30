@@ -9,6 +9,7 @@ interface PostGridProps {
   onLoadMore: () => void;
   hasMore: boolean;
   isLoading: boolean;
+  className?: string;
 }
 
 export const PostGrid: React.FC<PostGridProps> = ({
@@ -17,7 +18,8 @@ export const PostGrid: React.FC<PostGridProps> = ({
   onPostClick,
   onLoadMore,
   hasMore,
-  isLoading
+  isLoading,
+  className = "masonry-grid"
 }) => {
   const observer = useRef<IntersectionObserver>();
   
@@ -35,7 +37,7 @@ export const PostGrid: React.FC<PostGridProps> = ({
   }, [isLoading, hasMore, onLoadMore]);
 
   return (
-    <div className="masonry-grid">
+    <div className={className}>
       {posts.map((post, index) => (
         <div
           key={post.id || post._id || index}

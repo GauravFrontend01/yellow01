@@ -57,6 +57,20 @@
       column-gap: 2.5rem;
     }
   }
+
+  /* Profile page specific masonry grid - always 2 columns */
+  .masonry-grid-profile {
+    column-count: 2;
+    column-gap: 2rem;
+    padding: 1.25rem 0;
+  }
+
+  .masonry-grid-profile .masonry-item {
+    break-inside: avoid;
+    margin-bottom: 2rem;
+    display: inline-block;
+    width: 100%;
+  }
 }
 
 /* Line clamp utilities for text truncation */
