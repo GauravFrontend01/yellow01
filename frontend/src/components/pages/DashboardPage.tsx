@@ -5,10 +5,27 @@ import { PostDetailModal } from '../modals/PostDetailModal';
 import { Post } from '../../types';
 import { feedService } from '../../services/feedService';
 
+// Custom hook to detect mobile screen
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+    };
+
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
+  return isMobile;
+};
+
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const { postId } = useParams<{ postId: string }>();
-  const location = useLocation();
+  const isMobile = useIsMobile();
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [currentPostIndex, setCurrentPostIndex] = useState<number>(-1);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -37,30 +54,38 @@ export const DashboardPage: React.FC = () => {
     fetchPosts();
   }, []);
 
-  // Handle post modal based on URL
+  // Handle post modal based on URL - only for desktop
   useEffect(() => {
-    console.log('DashboardPage useEffect - postId:', postId);
-    console.log('Available posts:', posts.map(p => p._id || p.id));
-    
-    if (postId && posts.length > 0) {
-      const post = posts.find(p => (p._id || p.id) === postId);
-      console.log('Found post:', post);
+    // Only show modal on desktop screens
+    if (!isMobile) {
+      console.log('DashboardPage useEffect - postId:', postId);
+      console.log('Available posts:', posts.map(p => p._id || p.id));
       
-      if (post) {
-        setSelectedPost(post);
-        setCurrentPostIndex(posts.indexOf(post));
-        console.log('Post set, currentPostIndex:', posts.indexOf(post));
-      } else {
-        console.log('Post not found, redirecting to dashboard');
-        // Post not found, redirect to dashboard
-        navigate('/dashboard', { replace: true });
+      if (postId && posts.length > 0) {
+        const post = posts.find(p => (p._id || p.id) === postId);
+        console.log('Found post:', post);
+        
+        if (post) {
+          setSelectedPost(post);
+          setCurrentPostIndex(posts.indexOf(post));
+          console.log('Post set, currentPostIndex:', posts.indexOf(post));
+        } else {
+          console.log('Post not found, redirecting to dashboard');
+          // Post not found, redirect to dashboard
+          navigate('/dashboard', { replace: true });
+        }
+      } else if (!postId) {
+        console.log('No postId, clearing selected post');
+        setSelectedPost(null);
+        setCurrentPostIndex(-1);
       }
-    } else if (!postId) {
-      console.log('No postId, clearing selected post');
-      setSelectedPost(null);
-      setCurrentPostIndex(-1);
+    } else {
+      // On mobile, if there's a postId in dashboard route, redirect to dedicated post page
+      if (postId) {
+        navigate(`/post/${postId}`, { replace: true });
+      }
     }
-  }, [postId, navigate, posts]);
+  }, [postId, navigate, posts, isMobile]);
 
   const handlePostClick = (post: Post) => {
     console.log('Post clicked:', post.id || post._id);
@@ -73,8 +98,13 @@ export const DashboardPage: React.FC = () => {
     console.log('Using postId:', postId);
     
     if (postId) {
-      // Update URL to include post ID
-      navigate(`/dashboard/post/${postId}`, { replace: false });
+      if (isMobile) {
+        // On mobile, navigate to dedicated post page
+        navigate(`/post/${postId}`);
+      } else {
+        // On desktop, show modal by updating URL
+        navigate(`/dashboard/post/${postId}`, { replace: false });
+      }
     } else {
       console.error('No valid ID found for post:', post);
     }
@@ -120,7 +150,8 @@ export const DashboardPage: React.FC = () => {
         onEditPost={handleEditPost} 
       />
       
-      {selectedPost && (
+      {/* Only show modal on desktop */}
+      {!isMobile && selectedPost && (
         <PostDetailModal
           post={selectedPost}
           onClose={handleCloseModal}
