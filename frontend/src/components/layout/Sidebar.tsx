@@ -67,7 +67,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Logo */}
         <div className="p-4 border-b border-gray-100/50">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-8 h-8 bg-gradient-to-r from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
               <span className="text-white font-bold text-sm">C</span>
             </div>
             <span 
