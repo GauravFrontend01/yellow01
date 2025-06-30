@@ -109,11 +109,11 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick }) => 
 
   return (
     <div 
-      className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-sm overflow-hidden border border-gray-100/50 hover:shadow-xl transition-all duration-300 cursor-pointer group h-fit"
+      className="bg-white/90 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-sm overflow-hidden border border-gray-100/50 hover:shadow-xl transition-all duration-300 cursor-pointer group h-fit"
       onClick={onClick}
     >
       {/* Post Image */}
-      <div className="relative overflow-hidden rounded-t-2xl">
+      <div className="relative overflow-hidden rounded-t-xl sm:rounded-t-2xl">
         <img
           src={imageUrl}
           alt={title}
@@ -124,7 +124,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick }) => 
         
         {/* Views Counter Overlay */}
         {views > 0 && (
-          <div className="absolute top-3 left-3 bg-black/50 text-white px-2 py-1 rounded-lg text-xs flex items-center space-x-1 backdrop-blur-sm">
+          <div className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-black/50 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs flex items-center space-x-1 backdrop-blur-sm">
             <Eye className="w-3 h-3" />
             <span>{views.toLocaleString()}</span>
           </div>
@@ -132,7 +132,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick }) => 
       </div>
 
       {/* Post Content */}
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-2 relative">
             <img
