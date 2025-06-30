@@ -11,6 +11,7 @@ interface PostDetailModalProps {
   onNext?: () => void;
   hasPrevious?: boolean;
   hasNext?: boolean;
+  onPostUpdate?: (updatedPost: Partial<Post>) => void;
 }
 
 interface Comment {
@@ -36,7 +37,8 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
   onPrevious,
   onNext,
   hasPrevious,
-  hasNext
+  hasNext,
+  onPostUpdate
 }) => {
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(post.isLiked || false);
@@ -65,8 +67,24 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
     
     try {
       setIsLoadingComments(true);
-      const response = await tweetService.getComments(postId);
-      setComments(response.data.comments || []);
+      
+      // Fetch both comments and the accurate count from backend
+      const [commentsResponse, countResponse] = await Promise.all([
+        tweetService.getComments(postId),
+        tweetService.getCommentCount(postId)
+      ]);
+      
+      setComments(commentsResponse.data.comments || []);
+      const actualCommentCount = countResponse.data.count;
+      setCommentCount(actualCommentCount);
+      
+      // Update parent component with actual count from backend
+      if (onPostUpdate && actualCommentCount !== post.comments) {
+        onPostUpdate({
+          ...post,
+          comments: actualCommentCount
+        });
+      }
     } catch (error) {
       console.error('Failed to fetch comments:', error);
       setComments([]);
@@ -122,6 +140,15 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
       const response = await tweetService.toggleLike(postId);
       setIsLiked(response.data.liked);
       setLikeCount(response.data.likeCount);
+      
+      // Update parent component
+      if (onPostUpdate) {
+        onPostUpdate({
+          ...post,
+          likes: response.data.likeCount,
+          isLiked: response.data.liked
+        });
+      }
     } catch (error) {
       console.error('Failed to toggle like:', error);
     }
@@ -136,6 +163,14 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
     try {
       const response = await tweetService.toggleBookmark(postId);
       setIsBookmarked(response.data.bookmarked);
+      
+      // Update parent component
+      if (onPostUpdate) {
+        onPostUpdate({
+          ...post,
+          isBookmarked: response.data.bookmarked
+        });
+      }
     } catch (error) {
       console.error('Failed to toggle bookmark:', error);
     }
@@ -206,7 +241,33 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
         // Add the new comment to the list
         if (response.data) {
           setComments(prev => [response.data, ...prev]);
-          setCommentCount(prev => prev + 1);
+          
+          // Fetch the updated comment count from backend to ensure sync
+          try {
+            const countResponse = await tweetService.getCommentCount(postId);
+            const actualCommentCount = countResponse.data.count;
+            setCommentCount(actualCommentCount);
+            
+            // Update parent component with actual comment count from backend
+            if (onPostUpdate) {
+              onPostUpdate({
+                ...post,
+                comments: actualCommentCount
+              });
+            }
+          } catch (countError) {
+            console.error('Failed to fetch updated comment count:', countError);
+            // Fallback to local increment if fetching count fails
+            const newCommentCount = commentCount + 1;
+            setCommentCount(newCommentCount);
+            
+            if (onPostUpdate) {
+              onPostUpdate({
+                ...post,
+                comments: newCommentCount
+              });
+            }
+          }
         }
         
         console.log('Comment posted successfully!');

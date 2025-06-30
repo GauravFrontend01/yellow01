@@ -150,6 +150,22 @@ export const DashboardPage: React.FC = () => {
     console.log('Edit post:', post);
   };
 
+  const handlePostUpdate = (updatedPost: Partial<Post>) => {
+    // Update the specific post in the posts array
+    setPosts(prevPosts => 
+      prevPosts.map(post => 
+        (post._id || post.id) === (updatedPost._id || updatedPost.id)
+          ? { ...post, ...updatedPost }
+          : post
+      )
+    );
+    
+    // Also update the selected post if it's the same post
+    if (selectedPost && ((selectedPost._id || selectedPost.id) === (updatedPost._id || updatedPost.id))) {
+      setSelectedPost({ ...selectedPost, ...updatedPost });
+    }
+  };
+
   const handleRetry = () => {
     fetchPosts();
   };
@@ -174,6 +190,7 @@ export const DashboardPage: React.FC = () => {
           onNext={currentPostIndex < posts.length - 1 ? handleNextPost : undefined}
           hasPrevious={currentPostIndex > 0}
           hasNext={currentPostIndex < posts.length - 1}
+          onPostUpdate={handlePostUpdate}
         />
       )}
     </>
