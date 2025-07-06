@@ -99,7 +99,7 @@ export const CollectionsPageWrapper: React.FC = () => {
   };
 
   const handleEditPost = (post: Post) => {
-    console.log('Edit post:', post);
+    console.log('Edit', post);
   };
 
   const handlePostUpdate = (updatedPost: Partial<Post>) => {

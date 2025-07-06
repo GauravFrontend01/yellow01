@@ -11,7 +11,6 @@ const useIsMobile = () => {
   useEffect(() => {
     const checkIsMobile = () => {
       const mobile = window.innerWidth < 1024; // lg breakpoint
-      console.log('📱 Screen width:', window.innerWidth, 'isMobile:', mobile);
       setIsMobile(mobile);
     };
 
@@ -35,8 +34,6 @@ export const DashboardPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
-  console.log('🎯 DashboardPage render - postId:', postId, 'isMobile:', isMobile);
-  console.log('🎯 Posts loaded:', posts.length);
 
   const fetchPosts = async (tag?: string) => {
     try {
@@ -44,10 +41,7 @@ export const DashboardPage: React.FC = () => {
       setError(null);
       const response = await feedService.getFeedPosts(undefined, 20, tag || undefined);
       setPosts(response.posts || []);
-      console.log('📊 DashboardPage fetched posts:', response.posts?.length || 0, 'posts');
-      console.log('📊 Post IDs:', response.posts?.map(p => p._id || p.id) || []);
     } catch (error: any) {
-      console.error('❌ API error fetching posts:', error);
       setError(error.response?.data?.message || 'Failed to load posts. Please try again.');
       setPosts([]);
     } finally {
@@ -62,61 +56,40 @@ export const DashboardPage: React.FC = () => {
   }, [location.search]);
 
   useEffect(() => {
-    console.log('🔄 Fetching posts for tag:', selectedTag);
     fetchPosts(selectedTag || undefined);
   }, [selectedTag]);
 
   useEffect(() => {
-    console.log('🔍 Post modal useEffect - isMobile:', isMobile, 'postId:', postId, 'posts.length:', posts.length);
     
     if (!isMobile) {
-      console.log('💻 Desktop mode - handling modal');
-      console.log('💻 DashboardPage useEffect - postId:', postId);
-      console.log('💻 Available posts:', posts.map(p => p._id || p.id));
       
       if (postId && posts.length > 0) {
         const post = posts.find(p => (p._id || p.id) === postId);
-        console.log('💻 Found post:', post);
         
         if (post) {
           setSelectedPost(post);
           setCurrentPostIndex(posts.indexOf(post));
-          console.log('💻 Post set, currentPostIndex:', posts.indexOf(post));
         } else {
-          console.log('💻 Post not found, redirecting to dashboard');
           navigate('/dashboard', { replace: true });
         }
       } else if (!postId) {
-        console.log('💻 No postId, clearing selected post');
         setSelectedPost(null);
         setCurrentPostIndex(-1);
       }
     } else {
-      console.log('📱 Mobile mode - checking for redirect');
       if (postId) {
-        console.log('📱 Mobile redirect to /post/' + postId);
         navigate(`/post/${postId}`, { replace: true });
       }
     }
   }, [postId, navigate, posts, isMobile]);
 
   const handlePostClick = (post: Post) => {
-    console.log('🖱️ Post clicked:', post.id || post._id);
-    console.log('🖱️ Full post object:', post);
-    console.log('🖱️ Post _id:', post._id);
-    console.log('🖱️ Post keys:', Object.keys(post));
-    console.log('🖱️ isMobile:', isMobile);
-    
     const postId = post._id || post.id;
-    console.log('🖱️ Using postId:', postId);
     
     if (postId) {
       if (isMobile) {
-        console.log('📱 Mobile navigation to /post/' + postId);
-        console.log('📱 Passing post in state:', post.title);
         navigate(`/post/${postId}`, { state: { post } });
       } else {
-        console.log('💻 Desktop navigation to /dashboard/post/' + postId);
         navigate(`/dashboard/post/${postId}`, { replace: false });
       }
     } else {
@@ -167,14 +140,12 @@ export const DashboardPage: React.FC = () => {
   };
 
   const handleTagClick = (tag: string) => {
-    console.log('🏷️ Tag clicked:', tag);
     const searchParams = new URLSearchParams(location.search);
     searchParams.set('tag', tag);
     navigate(`/dashboard?${searchParams.toString()}`, { replace: true });
   };
 
   const handleClearTag = () => {
-    console.log('🏷️ Clearing tag filter');
     const searchParams = new URLSearchParams(location.search);
     searchParams.delete('tag');
     const newSearch = searchParams.toString();

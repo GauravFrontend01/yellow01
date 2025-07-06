@@ -24,7 +24,6 @@ export const Login: React.FC = () => {
       };
       
       const response = await userService.login(loginData);
-      console.log('Raw login API response:', response);
       
       dispatch(loginSuccess({
         user: response.user,

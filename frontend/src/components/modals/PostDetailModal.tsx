@@ -173,7 +173,6 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
     try {
       const url = `${window.location.origin}/dashboard/post/${post._id || post.id}`;
       await navigator.clipboard.writeText(url);
-      console.log('Link copied to clipboard');
       setShowMenu(false);
     } catch (error) {
       console.error('Error copying link:', error);
@@ -191,7 +190,6 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
         });
       } else {
         await navigator.clipboard.writeText(url);
-        console.log('Link copied to clipboard');
       }
     } catch (error) {
       console.error('Error sharing:', error);
@@ -199,17 +197,14 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
   };
 
   const handleUnfollow = () => {
-    console.log('Unfollow user:', userHandle);
     setShowProfileMenu(false);
   };
 
   const handleBlock = () => {
-    console.log('Block user:', userHandle);
     setShowProfileMenu(false);
   };
 
   const handleReport = () => {
-    console.log('Report post:', post._id || post.id);
     setShowMenu(false);
   };
 
@@ -253,7 +248,6 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
           }
         }
         
-        console.log('Comment posted successfully!');
       } catch (error: any) {
         console.error('Failed to post comment:', error);
       }
