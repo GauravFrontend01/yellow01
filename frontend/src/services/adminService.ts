@@ -114,7 +114,6 @@ export interface PaginatedUsers {
 }
 
 class AdminService {
-  // Analytics endpoints
   async getAnalytics(): Promise<AnalyticsData> {
     const response = await axios.get('/admin/analytics');
     return response.data.data;
@@ -130,7 +129,6 @@ class AdminService {
     return response.data.data;
   }
 
-  // User management endpoints
   async getAllUsers(page: number = 1, limit: number = 10): Promise<PaginatedUsers> {
     const response = await axios.get(`/admin/users?page=${page}&limit=${limit}`);
     return response.data.data;

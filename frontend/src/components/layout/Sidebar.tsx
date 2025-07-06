@@ -27,7 +27,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     console.log('Logout button clicked - clearing local state');
     dispatch(logout());
     console.log('Logout action dispatched - user logged out');
-    onCloseMobileMenu(); // Close mobile menu after logout
+    onCloseMobileMenu(); 
   };
 
   const baseMenuItems = [
@@ -46,7 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const handleNavigation = (path: string) => {
     navigate(path);
-    onCloseMobileMenu(); // Close mobile menu after navigation
+    onCloseMobileMenu(); 
   };
 
   return (
