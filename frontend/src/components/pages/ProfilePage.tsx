@@ -136,7 +136,6 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onEditPost, onPostClic
   };
 
   const handleReport = () => {
-    console.log('Report user:', profile?.username);
     setShowMenu(false);
   };
 

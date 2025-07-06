@@ -92,9 +92,7 @@ export const DashboardPage: React.FC = () => {
       } else {
         navigate(`/dashboard/post/${postId}`, { replace: false });
       }
-    } else {
-      console.error('❌ No valid ID found for post:', post);
-    }
+    } 
   };
 
   const handleCloseModal = () => {

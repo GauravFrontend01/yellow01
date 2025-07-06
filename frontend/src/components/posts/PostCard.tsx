@@ -65,7 +65,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick, onTag
     try {
       const url = `${window.location.origin}/dashboard/post/${postId}`;
       await navigator.clipboard.writeText(url);
-      console.log('Link copied to clipboard');
       setShowMenu(false);
     } catch (error) {
       console.error('Error copying link:', error);
@@ -86,19 +85,16 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick, onTag
 
   const handleUnfollow = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('Unfollow user:', userHandle);
     setShowProfileMenu(false);
   };
 
   const handleBlock = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('Block user:', userHandle);
     setShowProfileMenu(false);
   };
 
   const handleReport = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('Report post:', postId);
     setShowMenu(false);
   };
 
