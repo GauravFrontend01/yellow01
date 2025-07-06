@@ -21,6 +21,8 @@ import { UploadPage } from './components/pages/UploadPage';
 import { SearchPage } from './components/pages/SearchPage';
 import { PlaceholderPage } from './components/pages/PlaceholderPage';
 import { AdminDashboard } from './components/pages/AdminDashboard';
+import { FavoritesPageWrapper } from './components/pages/FavoritesPageWrapper';
+import { CollectionsPageWrapper } from './components/pages/CollectionsPageWrapper';
 
 // Icons
 import { TrendingUp, Heart, Bookmark, Users, Settings } from 'lucide-react';
@@ -79,28 +81,10 @@ function App() {
               />
             } 
           />
-          <Route 
-            path="favorites" 
-            element={
-              <PlaceholderPage 
-                title="Favorites"
-                description="Your liked posts and content"
-                icon={Heart}
-                gradientColors="bg-gradient-to-r from-pink-400 to-red-500"
-              />
-            } 
-          />
-          <Route 
-            path="saved" 
-            element={
-              <PlaceholderPage 
-                title="Collections"
-                description="Your saved posts and bookmarks"
-                icon={Bookmark}
-                gradientColors="bg-gradient-to-r from-blue-400 to-purple-500"
-              />
-            } 
-          />
+          <Route path="favorites" element={<FavoritesPageWrapper />} />
+          <Route path="favorites/post/:postId" element={<FavoritesPageWrapper />} />
+          <Route path="saved" element={<CollectionsPageWrapper />} />
+          <Route path="saved/post/:postId" element={<CollectionsPageWrapper />} />
           <Route 
             path="following" 
             element={
