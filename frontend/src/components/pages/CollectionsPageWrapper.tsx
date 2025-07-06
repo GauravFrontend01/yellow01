@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { CollectionsPage } from './CollectionsPage';
 import { PostDetailModal } from '../modals/PostDetailModal';
 import { Post } from '../../types';
@@ -25,7 +25,6 @@ const useIsMobile = () => {
 export const CollectionsPageWrapper: React.FC = () => {
   const navigate = useNavigate();
   const { postId } = useParams<{ postId: string }>();
-  const location = useLocation();
   const isMobile = useIsMobile();
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [currentPostIndex, setCurrentPostIndex] = useState<number>(-1);
@@ -33,7 +32,7 @@ export const CollectionsPageWrapper: React.FC = () => {
 
   const fetchBookmarkedPosts = async () => {
     try {
-      const response = await bookmarkService.getUserBookmarkedPosts(undefined, 50); // Get more for navigation
+      const response = await bookmarkService.getUserBookmarkedPosts(undefined, 50); 
       setPosts(response.tweets || []);
     } catch (error) {
       console.error('Failed to fetch bookmarked posts for navigation:', error);

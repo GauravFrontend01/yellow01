@@ -67,7 +67,7 @@ export const PostDetailPageWrapper: React.FC = () => {
     };
 
     fetchPost();
-  }, [id, post]); // Added post as dependency
+  }, [id, post]); 
 
   const handleEditPost = (editedPost: Post) => {
     console.log('✏️ Edit post:', editedPost);

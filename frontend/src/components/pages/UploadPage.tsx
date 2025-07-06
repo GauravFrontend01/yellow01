@@ -46,7 +46,7 @@ export const UploadPage: React.FC = () => {
     if (trimmedValue.length === 0) {
       return 'Title is required';
     }
-    if (trimmedValue.length > 100) { // Reasonable title limit
+    if (trimmedValue.length > 100) { 
       return 'Title must be 100 characters or less';
     }
     return undefined;

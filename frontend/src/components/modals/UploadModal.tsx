@@ -1,8 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { X, Upload, Image, Camera, Video, FileText, AlertCircle, CheckCircle } from 'lucide-react';
+import { X, Upload, Image, Camera,AlertCircle, CheckCircle } from 'lucide-react';
 import { tweetService, CreateTweetData } from '../../services/tweetService';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
 
 interface UploadModalProps {
   isOpen: boolean;
@@ -30,7 +28,6 @@ export const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpl
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { user } = useSelector((state: RootState) => state.auth);
 
   const MAX_CONTENT_LENGTH = 280;
   const MAX_MEDIA_SIZE = 10 * 1024 * 1024; // 10MB in bytes
@@ -211,7 +208,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpl
         title: title.trim(),
         content: content.trim(),
         media: selectedFile!,
-        tags: tags // Add tags to the submission
+        tags: tags 
       };
       const response = await tweetService.createTweet(tweetData);
       onUpload({
