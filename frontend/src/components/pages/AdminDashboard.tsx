@@ -4,17 +4,10 @@ import {
   FileText, 
   Heart, 
   Eye, 
-  Bookmark, 
-  MessageCircle, 
-  TrendingUp, 
-  Calendar,
-  Shield,
   Edit,
   Trash2,
   RefreshCw,
   BarChart3,
-  PieChart,
-  Activity
 } from 'lucide-react';
 import { adminService, AnalyticsData, PaginatedUsers, User } from '../../services/adminService';
 
