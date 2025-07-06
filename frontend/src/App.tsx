@@ -11,6 +11,7 @@ import { Signup } from './components/auth/Signup';
 // Layout Components
 import { Layout } from './components/layout/Layout';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { AdminProtectedRoute } from './components/AdminProtectedRoute';
 
 // Page Components
 import { DashboardPage } from './components/pages/DashboardPage';
@@ -19,6 +20,7 @@ import { PostDetailPageWrapper } from './components/pages/PostDetailPageWrapper'
 import { UploadPage } from './components/pages/UploadPage';
 import { SearchPage } from './components/pages/SearchPage';
 import { PlaceholderPage } from './components/pages/PlaceholderPage';
+import { AdminDashboard } from './components/pages/AdminDashboard';
 
 // Icons
 import { TrendingUp, Heart, Bookmark, Users, Settings } from 'lucide-react';
@@ -121,6 +123,7 @@ function App() {
               />
             } 
           />
+          <Route path="admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
           <Route path="post/:id" element={<PostDetailPageWrapper />} />
         </Route>
 

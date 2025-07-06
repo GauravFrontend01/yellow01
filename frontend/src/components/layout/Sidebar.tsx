@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, User, Upload, Heart, Bookmark, LogOut, Users } from 'lucide-react';
+import { Home, User, Upload, Heart, Bookmark, LogOut, Users, Shield } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../store';
@@ -30,13 +30,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
     onCloseMobileMenu(); // Close mobile menu after logout
   };
 
-  const menuItems = [
+  const baseMenuItems = [
     { id: 'home', icon: Home, label: 'Home', path: '/dashboard' },
     { id: 'favorites', icon: Heart, label: 'Favorites', path: '/favorites' },
     { id: 'saved', icon: Bookmark, label: 'Collections', path: '/saved' },
     { id: 'following', icon: Users, label: 'Following', path: '/following' },
     { id: 'profile', icon: User, label: 'Profile', path: '/profile' },
   ];
+
+  const adminMenuItem = { id: 'admin', icon: Shield, label: 'Admin', path: '/admin' };
+
+  const menuItems = user?.role === 'admin' 
+    ? [...baseMenuItems, adminMenuItem]
+    : baseMenuItems;
 
   const handleNavigation = (path: string) => {
     navigate(path);
