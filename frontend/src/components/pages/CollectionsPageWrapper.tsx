@@ -5,7 +5,6 @@ import { PostDetailModal } from '../modals/PostDetailModal';
 import { Post } from '../../types';
 import { bookmarkService } from '../../services/bookmarkService';
 
-// Custom hook to detect mobile screen
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -32,7 +31,6 @@ export const CollectionsPageWrapper: React.FC = () => {
   const [currentPostIndex, setCurrentPostIndex] = useState<number>(-1);
   const [posts, setPosts] = useState<Post[]>([]);
 
-  // Fetch bookmarked posts for modal navigation
   const fetchBookmarkedPosts = async () => {
     try {
       const response = await bookmarkService.getUserBookmarkedPosts(undefined, 50); // Get more for navigation
@@ -47,9 +45,7 @@ export const CollectionsPageWrapper: React.FC = () => {
     fetchBookmarkedPosts();
   }, []);
 
-  // Handle post modal based on URL - only for desktop
   useEffect(() => {
-    // Only show modal on desktop screens
     if (!isMobile) {
       if (postId && posts.length > 0) {
         const post = posts.find(p => (p._id || p.id) === postId);
@@ -58,7 +54,6 @@ export const CollectionsPageWrapper: React.FC = () => {
           setSelectedPost(post);
           setCurrentPostIndex(posts.indexOf(post));
         } else {
-          // Post not found, redirect to collections
           navigate('/saved', { replace: true });
         }
       } else if (!postId) {
@@ -66,7 +61,6 @@ export const CollectionsPageWrapper: React.FC = () => {
         setCurrentPostIndex(-1);
       }
     } else {
-      // On mobile, if there's a postId in saved route, redirect to dedicated post page
       if (postId) {
         navigate(`/post/${postId}`, { replace: true });
       }
@@ -78,17 +72,14 @@ export const CollectionsPageWrapper: React.FC = () => {
     
     if (postId) {
       if (isMobile) {
-        // On mobile, navigate to dedicated post page and pass post data in state
         navigate(`/post/${postId}`, { state: { post } });
       } else {
-        // On desktop, show modal by updating URL
         navigate(`/saved/post/${postId}`, { replace: false });
       }
     }
   };
 
   const handleCloseModal = () => {
-    // Navigate back to collections without the post ID
     navigate('/saved', { replace: false });
   };
 
@@ -113,7 +104,6 @@ export const CollectionsPageWrapper: React.FC = () => {
   };
 
   const handlePostUpdate = (updatedPost: Partial<Post>) => {
-    // Update the specific post in the posts array
     setPosts(prevPosts => 
       prevPosts.map(post => 
         (post._id || post.id) === (updatedPost._id || updatedPost.id)
@@ -122,14 +112,12 @@ export const CollectionsPageWrapper: React.FC = () => {
       )
     );
     
-    // Also update the selected post if it's the same post
     if (selectedPost && ((selectedPost._id || selectedPost.id) === (updatedPost._id || updatedPost.id))) {
       setSelectedPost({ ...selectedPost, ...updatedPost });
     }
   };
 
   const handleTagClick = (tag: string) => {
-    // Navigate to dashboard with tag filter
     navigate(`/dashboard?tag=${tag}`, { replace: false });
   };
 

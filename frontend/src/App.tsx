@@ -4,16 +4,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from './store';
 import { initializeAuth } from './features/auth/authSlice';
 
-// Auth Components
 import { Login } from './components/auth/Login';
 import { Signup } from './components/auth/Signup';
 
-// Layout Components
 import { Layout } from './components/layout/Layout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AdminProtectedRoute } from './components/AdminProtectedRoute';
 
-// Page Components
 import { DashboardPage } from './components/pages/DashboardPage';
 import { ProfilePage } from './components/pages/ProfilePage';
 import { PostDetailPageWrapper } from './components/pages/PostDetailPageWrapper';
@@ -24,7 +21,6 @@ import { AdminDashboard } from './components/pages/AdminDashboard';
 import { FavoritesPageWrapper } from './components/pages/FavoritesPageWrapper';
 import { CollectionsPageWrapper } from './components/pages/CollectionsPageWrapper';
 
-// Icons
 import { TrendingUp, Heart, Bookmark, Users, Settings } from 'lucide-react';
 
 function App() {
@@ -32,7 +28,6 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // Initialize auth from localStorage
     dispatch(initializeAuth());
   }, [dispatch]);
 

@@ -63,7 +63,6 @@ export const FavoritesPage: React.FC<FavoritesPageProps> = ({
     fetchLikedPosts();
   };
 
-  // Error State
   if (error && !isLoading && posts.length === 0) {
     return (
       <div className="space-y-4 sm:space-y-6">
@@ -83,7 +82,6 @@ export const FavoritesPage: React.FC<FavoritesPageProps> = ({
     );
   }
 
-  // Empty State (no liked posts)
   if (!isLoading && !error && posts.length === 0) {
     return (
       <div className="space-y-4 sm:space-y-6">

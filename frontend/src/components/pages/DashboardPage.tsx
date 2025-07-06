@@ -5,7 +5,6 @@ import { PostDetailModal } from '../modals/PostDetailModal';
 import { Post } from '../../types';
 import { feedService } from '../../services/feedService';
 
-// Custom hook to detect mobile screen
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -39,7 +38,6 @@ export const DashboardPage: React.FC = () => {
   console.log('🎯 DashboardPage render - postId:', postId, 'isMobile:', isMobile);
   console.log('🎯 Posts loaded:', posts.length);
 
-  // Fetch posts for dashboard
   const fetchPosts = async (tag?: string) => {
     try {
       setIsLoading(true);
@@ -57,24 +55,20 @@ export const DashboardPage: React.FC = () => {
     }
   };
 
-  // Handle URL search params for tag filtering
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const tagParam = searchParams.get('tag');
     setSelectedTag(tagParam);
   }, [location.search]);
 
-  // Fetch posts when tag changes
   useEffect(() => {
     console.log('🔄 Fetching posts for tag:', selectedTag);
     fetchPosts(selectedTag || undefined);
   }, [selectedTag]);
 
-  // Handle post modal based on URL - only for desktop
   useEffect(() => {
     console.log('🔍 Post modal useEffect - isMobile:', isMobile, 'postId:', postId, 'posts.length:', posts.length);
     
-    // Only show modal on desktop screens
     if (!isMobile) {
       console.log('💻 Desktop mode - handling modal');
       console.log('💻 DashboardPage useEffect - postId:', postId);
@@ -90,7 +84,6 @@ export const DashboardPage: React.FC = () => {
           console.log('💻 Post set, currentPostIndex:', posts.indexOf(post));
         } else {
           console.log('💻 Post not found, redirecting to dashboard');
-          // Post not found, redirect to dashboard
           navigate('/dashboard', { replace: true });
         }
       } else if (!postId) {
@@ -100,7 +93,6 @@ export const DashboardPage: React.FC = () => {
       }
     } else {
       console.log('📱 Mobile mode - checking for redirect');
-      // On mobile, if there's a postId in dashboard route, redirect to dedicated post page
       if (postId) {
         console.log('📱 Mobile redirect to /post/' + postId);
         navigate(`/post/${postId}`, { replace: true });
@@ -115,7 +107,6 @@ export const DashboardPage: React.FC = () => {
     console.log('🖱️ Post keys:', Object.keys(post));
     console.log('🖱️ isMobile:', isMobile);
     
-    // Use _id for API posts, id for mock posts
     const postId = post._id || post.id;
     console.log('🖱️ Using postId:', postId);
     
@@ -123,11 +114,9 @@ export const DashboardPage: React.FC = () => {
       if (isMobile) {
         console.log('📱 Mobile navigation to /post/' + postId);
         console.log('📱 Passing post in state:', post.title);
-        // On mobile, navigate to dedicated post page and pass post data in state
         navigate(`/post/${postId}`, { state: { post } });
       } else {
         console.log('💻 Desktop navigation to /dashboard/post/' + postId);
-        // On desktop, show modal by updating URL
         navigate(`/dashboard/post/${postId}`, { replace: false });
       }
     } else {
@@ -136,7 +125,6 @@ export const DashboardPage: React.FC = () => {
   };
 
   const handleCloseModal = () => {
-    // Navigate back to dashboard without the post ID
     navigate('/dashboard', { replace: false });
   };
 
@@ -161,7 +149,6 @@ export const DashboardPage: React.FC = () => {
   };
 
   const handlePostUpdate = (updatedPost: Partial<Post>) => {
-    // Update the specific post in the posts array
     setPosts(prevPosts => 
       prevPosts.map(post => 
         (post._id || post.id) === (updatedPost._id || updatedPost.id)
@@ -170,7 +157,6 @@ export const DashboardPage: React.FC = () => {
       )
     );
     
-    // Also update the selected post if it's the same post
     if (selectedPost && ((selectedPost._id || selectedPost.id) === (updatedPost._id || updatedPost.id))) {
       setSelectedPost({ ...selectedPost, ...updatedPost });
     }
@@ -182,7 +168,6 @@ export const DashboardPage: React.FC = () => {
 
   const handleTagClick = (tag: string) => {
     console.log('🏷️ Tag clicked:', tag);
-    // Update URL with tag parameter
     const searchParams = new URLSearchParams(location.search);
     searchParams.set('tag', tag);
     navigate(`/dashboard?${searchParams.toString()}`, { replace: true });
@@ -190,7 +175,6 @@ export const DashboardPage: React.FC = () => {
 
   const handleClearTag = () => {
     console.log('🏷️ Clearing tag filter');
-    // Remove tag parameter from URL
     const searchParams = new URLSearchParams(location.search);
     searchParams.delete('tag');
     const newSearch = searchParams.toString();

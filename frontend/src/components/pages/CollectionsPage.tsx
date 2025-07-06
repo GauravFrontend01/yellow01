@@ -63,7 +63,6 @@ export const CollectionsPage: React.FC<CollectionsPageProps> = ({
     fetchBookmarkedPosts();
   };
 
-  // Error State
   if (error && !isLoading && posts.length === 0) {
     return (
       <div className="space-y-4 sm:space-y-6">
@@ -83,7 +82,6 @@ export const CollectionsPage: React.FC<CollectionsPageProps> = ({
     );
   }
 
-  // Empty State (no bookmarked posts)
   if (!isLoading && !error && posts.length === 0) {
     return (
       <div className="space-y-4 sm:space-y-6">

@@ -11,12 +11,10 @@ interface AdminProtectedRouteProps {
 export const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({ children }) => {
   const { user } = useSelector((state: RootState) => state.auth);
 
-  // If user is not logged in, redirect to login
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  // If user is not an admin, show access denied page
   if (user.role !== 'admin') {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -43,6 +41,5 @@ export const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({ childr
     );
   }
 
-  // If user is admin, render the children
   return <>{children}</>;
 }; 

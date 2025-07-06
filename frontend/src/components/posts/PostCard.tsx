@@ -19,7 +19,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick, onTag
   const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked || false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
-  // Handle both data structures
   const imageUrl = post.media || post.imageUrl || '';
   const title = post.title || '';
   const content = post.content || post.description || '';
@@ -44,7 +43,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick, onTag
       setLikeCount(response.data.likeCount);
     } catch (error) {
       console.error('Error toggling like:', error);
-      // Revert optimistic update on error
     }
   };
 
@@ -67,7 +65,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick, onTag
     try {
       const url = `${window.location.origin}/dashboard/post/${postId}`;
       await navigator.clipboard.writeText(url);
-      // TODO: Show toast notification
       console.log('Link copied to clipboard');
       setShowMenu(false);
     } catch (error) {
@@ -89,21 +86,18 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick, onTag
 
   const handleUnfollow = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // TODO: API call to unfollow user
     console.log('Unfollow user:', userHandle);
     setShowProfileMenu(false);
   };
 
   const handleBlock = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // TODO: API call to block user
     console.log('Block user:', userHandle);
     setShowProfileMenu(false);
   };
 
   const handleReport = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // TODO: Open report modal
     console.log('Report post:', postId);
     setShowMenu(false);
   };
@@ -297,7 +291,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick, onTag
             <button 
               onClick={(e) => {
                 e.stopPropagation();
-                // TODO: Share functionality
               }}
               className="hover:text-green-500 transition-colors group"
             >
