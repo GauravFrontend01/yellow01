@@ -9,6 +9,7 @@ interface HomePageProps {
   error?: string | null;
   onRetry?: () => void;
   onEditPost: (post: Post) => void;
+  onDeletePost: (post: Post) => void;
   onPostClick: (post: Post) => void;
   onTagClick?: (tag: string) => void;
   selectedTag?: string | null;
@@ -21,6 +22,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   error, 
   onRetry, 
   onEditPost, 
+  onDeletePost,
   onPostClick,
   onTagClick,
   selectedTag,
@@ -221,6 +223,7 @@ export const HomePage: React.FC<HomePageProps> = ({
       <PostGrid 
         posts={filteredPosts} 
         onEditPost={onEditPost} 
+        onDeletePost={onDeletePost}
         onPostClick={onPostClick}
         onLoadMore={() => {}}
         hasMore={false}

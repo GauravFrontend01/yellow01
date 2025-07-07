@@ -1,23 +1,46 @@
-import React, { useState } from 'react';
-import { Heart, MessageCircle, Share2, MoreVertical, Eye, Bookmark, Link, UserMinus, UserX, Flag } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Heart, MessageCircle, Share2, MoreVertical, Eye, Bookmark, Link, UserMinus, UserX, Flag, Pencil, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Post } from '../../types';
 import { tweetService } from '../../services/tweetService';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 
 interface PostCardProps {
   post: Post;
   onEdit?: () => void;
+  onDelete?: () => void;
   onClick?: () => void;
   onTagClick?: (tag: string) => void;
 }
 
-export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick, onTagClick }) => {
+export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onDelete, onClick, onTagClick }) => {
   const navigate = useNavigate();
+  const cardRef = useRef<HTMLDivElement>(null);
   const [showMenu, setShowMenu] = useState(false);
   const [isLiked, setIsLiked] = useState(post.isLiked || false);
   const [likeCount, setLikeCount] = useState(post.likes || 0);
   const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked || false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  const currentUser = useSelector((state: RootState) => state.auth.user);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+        setShowProfileMenu(false);
+      }
+    };
+    if (showMenu || showProfileMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showMenu, showProfileMenu]);
+
+  const isOwner = currentUser && post.user && currentUser._id === post.user._id;
 
   const imageUrl = post.media || post.imageUrl || '';
   const title = post.title || '';
@@ -28,8 +51,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick, onTag
   const views = post.views || 0;
   const comments = post.comments || 0;
   const postId = post._id || post.id;
-
-
 
   const handleLike = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -100,7 +121,8 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick, onTag
 
   return (
     <div 
-      className="bg-white/90 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-sm overflow-hidden border border-gray-100/50 hover:shadow-xl transition-all duration-300 cursor-pointer group h-fit"
+      ref={cardRef}
+      className={`bg-white/90 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-sm border border-gray-100/50 hover:shadow-xl transition-all duration-300 cursor-pointer group h-fit relative ${showMenu || showProfileMenu ? 'z-20' : 'z-0'}`}
       onClick={onClick}
     >
       {/* Post Image */}
@@ -180,7 +202,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick, onTag
 
             {/* Dropdown Menu */}
             {showMenu && (
-              <div className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 min-w-48 py-1">
+              <div className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 min-w-48 py-1">
                 <button
                   onClick={handleCopyLink}
                   className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors flex items-center space-x-2 text-gray-700"
@@ -197,23 +219,35 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick, onTag
                 </button>
                 <button
                   onClick={handleReport}
-                  className="w-full text-left px-4 py-2 hover:bg-red-50 transition-colors flex items-center space-x-2 text-red-600"
+                  className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors flex items-center space-x-2 text-gray-700"
                 >
                   <Flag className="w-4 h-4" />
                   <span>Report post</span>
                 </button>
-                {onEdit && (
+                {isOwner && (
                   <>
                     <div className="border-t border-gray-100 my-1"></div>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        onEdit();
+                        if (onEdit) onEdit();
                         setShowMenu(false);
                       }}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors text-gray-700"
+                      className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors flex items-center space-x-2 text-gray-700"
                     >
-                      Edit post
+                      <Pencil className="w-4 h-4" />
+                      <span>Edit post</span>
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onDelete) onDelete();
+                        setShowMenu(false);
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-red-50 transition-colors flex items-center space-x-2 text-red-600"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      <span>Delete post</span>
                     </button>
                   </>
                 )}
@@ -297,16 +331,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onClick, onTag
       </div>
 
       {/* Click outside to close menus */}
-      {(showMenu || showProfileMenu) && (
-        <div 
-          className="fixed inset-0 z-10" 
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowMenu(false);
-            setShowProfileMenu(false);
-          }}
-        />
-      )}
+      {/* This is now handled by the useEffect hook */}
     </div>
   );
 };

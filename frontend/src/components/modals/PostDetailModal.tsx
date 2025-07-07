@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { X, Heart, MessageCircle, Share, Bookmark, MoreHorizontal, ArrowLeft, ArrowRight, Eye, Link, Flag, UserMinus, UserX } from 'lucide-react';
+import { X, Heart, MessageCircle, Share, Bookmark, MoreHorizontal, ArrowLeft, ArrowRight, Eye, Link, Flag, UserMinus, UserX, Pencil, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Post } from '../../types';
 import { tweetService } from '../../services/tweetService';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 
 interface PostDetailModalProps {
   post: Post;
@@ -12,6 +14,8 @@ interface PostDetailModalProps {
   hasPrevious?: boolean;
   hasNext?: boolean;
   onPostUpdate?: (updatedPost: Partial<Post>) => void;
+  onEdit?: (post: Post) => void;
+  onDelete?: (post: Post) => void;
 }
 
 interface Comment {
@@ -38,7 +42,9 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
   onNext,
   hasPrevious,
   hasNext,
-  onPostUpdate
+  onPostUpdate,
+  onEdit,
+  onDelete
 }) => {
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(post.isLiked || false);
@@ -51,6 +57,9 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
   const [isLoadingComments, setIsLoadingComments] = useState(false);
   const [commentCount, setCommentCount] = useState(post.comments || 0);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  const currentUser = useSelector((state: RootState) => state.auth.user);
+  const isOwner = currentUser && post.user && currentUser._id === post.user._id;
 
   const userHandle = post.user?.username || post.author?.name?.toLowerCase().replace(/\s+/g, '') || 'user';
   const postId = post._id || post.id;
@@ -390,6 +399,31 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                       <Flag className="w-4 h-4" />
                       <span>Report post</span>
                     </button>
+                    {isOwner && (
+                      <>
+                        <div className="border-t border-gray-100 my-1"></div>
+                        <button
+                          onClick={() => {
+                            onEdit?.(post);
+                            setShowMenu(false);
+                          }}
+                          className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors flex items-center space-x-2 text-gray-700"
+                        >
+                          <Pencil className="w-4 h-4" />
+                          <span>Edit post</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            onDelete?.(post);
+                            setShowMenu(false);
+                          }}
+                          className="w-full text-left px-4 py-2 hover:bg-red-50 transition-colors flex items-center space-x-2 text-red-600"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          <span>Delete post</span>
+                        </button>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
