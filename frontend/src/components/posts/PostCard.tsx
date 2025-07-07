@@ -77,8 +77,10 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onDelete, onCl
     try {
       const response = await tweetService.toggleBookmark(postId);
       setIsBookmarked(response.data.bookmarked);
+      toast.success(response.data.bookmarked ? 'Bookmarked!' : 'Bookmark removed');
     } catch (error) {
       console.error('Error toggling bookmark:', error);
+      toast.error('Could not update bookmark.');
     }
   };
 

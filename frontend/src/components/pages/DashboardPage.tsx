@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { HomePage } from './HomePage';
 import { PostDetailModal } from '../modals/PostDetailModal';
 import { EditPostModal } from '../modals/EditPostModal';
@@ -140,9 +141,10 @@ export const DashboardPage: React.FC = () => {
         handleCloseModal();
       }
       fetchPosts(selectedTag || undefined);
+      toast.success('Post deleted successfully!');
     } catch (err) {
       console.error('Failed to delete post:', err);
-      alert('Failed to delete post. Please try again.');
+      toast.error('Failed to delete post. Please try again.');
     } finally {
       setIsSubmittingDelete(false);
     }
@@ -222,6 +224,7 @@ export const DashboardPage: React.FC = () => {
           onPostUpdate={(_updatedPost) => {
             setEditingPost(null);
             fetchPosts(selectedTag || undefined);
+            toast.success('Post updated successfully!');
           }}
         />
       )}

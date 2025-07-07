@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Edit, MapPin, Calendar, Award, Heart, MoreHorizontal, UserX, Flag } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { RootState } from '../../store';
 import { PostGrid } from '../posts/PostGrid';
 import { userService } from '../../services/userService';
@@ -125,9 +126,10 @@ export const ProfilePage: React.FC = () => {
       await tweetService.deleteTweet(deletingPost._id!);
       setDeletingPost(null);
       await fetchUserPosts();
+      toast.success('Post deleted successfully');
     } catch (err) {
       console.error('Failed to delete post:', err);
-      alert('Failed to delete post. Please try again.');
+      toast.error('Failed to delete post. Please try again.');
     } finally {
       setIsSubmittingDelete(false);
     }
@@ -143,6 +145,7 @@ export const ProfilePage: React.FC = () => {
     try {
       const response = await userService.toggleFollow(profile._id);
       setIsFollowing(response.isFollowing);
+      toast.success(response.isFollowing ? `Followed @${profile.username}` : `Unfollowed @${profile.username}`);
       
       setProfile(prev => prev ? {
         ...prev,
@@ -153,6 +156,7 @@ export const ProfilePage: React.FC = () => {
       
     } catch (error) {
       console.error('Error toggling follow:', error);
+      toast.error('Something went wrong.');
     }
   };
 
@@ -162,6 +166,7 @@ export const ProfilePage: React.FC = () => {
     try {
       const response = await userService.toggleBlock(profile._id);
       setIsBlocked(response.isBlocked || false);
+      toast.success(response.isBlocked ? `Blocked @${profile.username}` : `Unblocked @${profile.username}`);
       
       if (response.isBlocked) {
         setIsFollowing(false);
@@ -174,6 +179,7 @@ export const ProfilePage: React.FC = () => {
       setShowMenu(false);
     } catch (error) {
       console.error('Error toggling block:', error);
+      toast.error('Something went wrong.');
     }
   };
 
@@ -416,6 +422,7 @@ export const ProfilePage: React.FC = () => {
           onPostUpdate={async () => {
             setEditingPost(null);
             await fetchUserPosts();
+            toast.success('Post updated successfully!');
           }}
         />
       )}

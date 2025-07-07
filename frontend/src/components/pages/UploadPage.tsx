@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Upload, ArrowLeft, AlertCircle, CheckCircle, Image as ImageIcon, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { tweetService } from '../../services/tweetService';
 
 interface ValidationErrors {
@@ -179,9 +180,11 @@ export const UploadPage: React.FC = () => {
       };
       
       await tweetService.createTweet(uploadData);
+      toast.success('Post created successfully!');
       navigate('/dashboard');
     } catch (error: any) {
       setError(error.response?.data?.message || 'Upload failed. Please try again.');
+      toast.error(error.response?.data?.message || 'Upload failed. Please try again.');
     } finally {
       setIsUploading(false);
     }
