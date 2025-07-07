@@ -7,11 +7,8 @@ import { PostGrid } from '../posts/PostGrid';
 import { userService } from '../../services/userService';
 import { tweetService } from '../../services/tweetService';
 import { Post } from '../../types';
-
-interface ProfilePageProps {
-  onEditPost: (post: any) => void;
-  onPostClick: (post: any) => void;
-}
+import { EditPostModal } from '../modals/EditPostModal';
+import { ConfirmDeleteModal } from '../modals/ConfirmDeleteModal';
 
 interface UserProfile {
   _id: string;
@@ -30,7 +27,7 @@ interface UserProfile {
   };
 }
 
-export const ProfilePage: React.FC<ProfilePageProps> = ({ onEditPost, onPostClick }) => {
+export const ProfilePage: React.FC = () => {
   const { user: currentUser } = useSelector((state: RootState) => state.auth);
   const { username } = useParams<{ username?: string }>();
   const navigate = useNavigate();
@@ -44,6 +41,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onEditPost, onPostClic
   const [showMenu, setShowMenu] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
+
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [deletingPost, setDeletingPost] = useState<Post | null>(null);
+  const [isSubmittingDelete, setIsSubmittingDelete] = useState(false);
 
   const profileUsername = username || currentUser?.username;
 
@@ -74,17 +75,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onEditPost, onPostClic
       setIsFollowing(profileData.relationshipStatus.isFollowing);
       setIsBlocked(profileData.relationshipStatus.isBlocked);
 
-      const postsData = await userService.getUserPosts(profileUsername!);
-      setUserPosts(postsData.posts || []);
+      await fetchUserPosts();
 
       if (profileData.relationshipStatus.isOwnProfile) {
-        try {
-          const likedData = await tweetService.getUserLikedTweets();
-          setLikedPosts(likedData.data.tweets || []);
-        } catch (error) {
-          console.error('Error fetching liked posts:', error);
-          setLikedPosts([]);
-        }
+        await fetchLikedPosts();
       }
 
     } catch (error: any) {
@@ -93,6 +87,54 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onEditPost, onPostClic
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const fetchUserPosts = async () => {
+    try {
+      const postsData = await userService.getUserPosts(profileUsername!);
+      setUserPosts(postsData.posts || []);
+    } catch (error) {
+      console.error('Error fetching user posts:', error);
+      setUserPosts([]);
+    }
+  };
+  
+  const fetchLikedPosts = async () => {
+    try {
+      const likedData = await tweetService.getUserLikedTweets();
+      setLikedPosts(likedData.data.tweets || []);
+    } catch (error) {
+      console.error('Error fetching liked posts:', error);
+      setLikedPosts([]);
+    }
+  };
+
+  const handleEditPost = (post: Post) => {
+    setEditingPost(post);
+  };
+
+  const handleDeletePost = (post: Post) => {
+    setDeletingPost(post);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingPost) return;
+
+    setIsSubmittingDelete(true);
+    try {
+      await tweetService.deleteTweet(deletingPost._id!);
+      setDeletingPost(null);
+      await fetchUserPosts();
+    } catch (err) {
+      console.error('Failed to delete post:', err);
+      alert('Failed to delete post. Please try again.');
+    } finally {
+      setIsSubmittingDelete(false);
+    }
+  };
+  
+  const handlePostClick = (post: Post) => {
+    navigate(`/dashboard/post/${post._id}`);
   };
 
   const handleFollow = async () => {
@@ -182,6 +224,38 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onEditPost, onPostClic
 
   const totalViews = userPosts.reduce((sum, post) => sum + (post.views || 0), 0);
   const totalLikes = userPosts.reduce((sum, post) => sum + (post.likes || 0), 0);
+
+  const renderPosts = () => {
+    return (
+      <PostGrid
+        posts={userPosts}
+        onPostClick={handlePostClick}
+        onLoadMore={() => {}}
+        hasMore={false}
+        isLoading={isLoading}
+        className="masonry-grid-profile"
+        onTagClick={handleTagClick}
+        onEditPost={handleEditPost}
+        onDeletePost={handleDeletePost}
+      />
+    );
+  };
+
+  const renderLiked = () => {
+    return (
+      <PostGrid
+        posts={likedPosts}
+        onPostClick={handlePostClick}
+        onLoadMore={() => {}}
+        hasMore={false}
+        isLoading={isLoading}
+        className="masonry-grid-profile"
+        onTagClick={handleTagClick}
+        onEditPost={handleEditPost}
+        onDeletePost={handleDeletePost}
+      />
+    );
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -330,32 +404,30 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onEditPost, onPostClic
         </div>
         
         <div className="p-6">
-                     {activeTab === 'posts' && (
-             <PostGrid 
-               posts={userPosts} 
-               onEditPost={profile.relationshipStatus.isOwnProfile ? onEditPost : undefined} 
-               onPostClick={onPostClick}
-               onLoadMore={() => {}}
-               hasMore={false}
-               isLoading={false}
-               className="masonry-grid-profile"
-               onTagClick={handleTagClick}
-             />
-           )}
-                     {activeTab === 'liked' && profile.relationshipStatus.isOwnProfile && (
-             <PostGrid 
-               posts={likedPosts} 
-               onEditPost={undefined} 
-               onPostClick={onPostClick}
-               onLoadMore={() => {}}
-               hasMore={false}
-               isLoading={false}
-               className="masonry-grid-profile"
-               onTagClick={handleTagClick}
-             />
-           )}
+                     {activeTab === 'posts' && renderPosts()}
+                     {activeTab === 'liked' && profile.relationshipStatus.isOwnProfile && renderLiked()}
         </div>
       </div>
+
+      {editingPost && (
+        <EditPostModal
+          post={editingPost}
+          onClose={() => setEditingPost(null)}
+          onPostUpdate={async () => {
+            setEditingPost(null);
+            await fetchUserPosts();
+          }}
+        />
+      )}
+
+      <ConfirmDeleteModal
+        isOpen={!!deletingPost}
+        onClose={() => setDeletingPost(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Post?"
+        message="Are you sure you want to permanently delete this post? This action cannot be undone."
+        isDeleting={isSubmittingDelete}
+      />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Heart, MessageCircle, Share2, MoreVertical, Eye, Bookmark, Link, UserMinus, UserX, Flag, Pencil, Trash2 } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreVertical, Eye, Bookmark, UserMinus, UserX, Flag, Pencil, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { Post } from '../../types';
 import { tweetService } from '../../services/tweetService';
@@ -81,14 +82,15 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onDelete, onCl
     }
   };
 
-  const handleCopyLink = async (e: React.MouseEvent) => {
+  const handleShareClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    const url = `${window.location.origin}/dashboard/post/${postId}`;
     try {
-      const url = `${window.location.origin}/dashboard/post/${postId}`;
       await navigator.clipboard.writeText(url);
-      setShowMenu(false);
+      toast.success('Link copied!');
     } catch (error) {
-      console.error('Error copying link:', error);
+      console.error('Failed to copy link: ', error);
+      toast.error('Failed to copy link.');
     }
   };
 
@@ -204,13 +206,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onDelete, onCl
             {showMenu && (
               <div className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 min-w-48 py-1">
                 <button
-                  onClick={handleCopyLink}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors flex items-center space-x-2 text-gray-700"
-                >
-                  <Link className="w-4 h-4" />
-                  <span>Copy link</span>
-                </button>
-                <button
                   onClick={handleBookmark}
                   className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors flex items-center space-x-2 text-gray-700"
                 >
@@ -319,9 +314,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onDelete, onCl
               <Bookmark className={`w-4 h-4 transition-transform group-hover:scale-110 ${isBookmarked ? 'fill-current' : ''}`} />
             </button>
             <button 
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
+              onClick={handleShareClick}
               className="hover:text-green-500 transition-colors group"
             >
               <Share2 className="w-4 h-4 transition-transform group-hover:scale-110" />
@@ -329,9 +322,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onDelete, onCl
           </div>
         </div>
       </div>
-
-      {/* Click outside to close menus */}
-      {/* This is now handled by the useEffect hook */}
     </div>
   );
 };
