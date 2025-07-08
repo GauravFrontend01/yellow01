@@ -14,6 +14,8 @@ interface HomePageProps {
   onTagClick?: (tag: string) => void;
   selectedTag?: string | null;
   onClearTag?: () => void;
+  sortBy: string;
+  onSortByChange: (sort: string) => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ 
@@ -26,10 +28,11 @@ export const HomePage: React.FC<HomePageProps> = ({
   onPostClick,
   onTagClick,
   selectedTag,
-  onClearTag
+  onClearTag,
+  sortBy,
+  onSortByChange
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('recent');
 
   const categories = [
     { id: 'all', label: 'All', tag: null },
@@ -54,18 +57,6 @@ export const HomePage: React.FC<HomePageProps> = ({
                          content.toLowerCase().includes(searchQuery.toLowerCase());
 
     return matchesSearch;
-  }).sort((a, b) => {
-    switch (sortBy) {
-      case 'popular':
-        return (b.likes || 0) - (a.likes || 0);
-      case 'liked':
-        return (b.likes || 0) - (a.likes || 0);
-      default: {
-        const aDate = new Date(a.createdAt || 0).getTime();
-        const bDate = new Date(b.createdAt || 0).getTime();
-        return bDate - aDate;
-      }
-    }
   });
 
   if (error && !isLoading) {
@@ -166,7 +157,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 return (
                   <button
                     key={option.id}
-                    onClick={() => setSortBy(option.id)}
+                    onClick={() => onSortByChange(option.id)}
                     className={`flex items-center space-x-1 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 ${
                       sortBy === option.id
                         ? 'bg-amber-100 text-amber-700 border border-amber-200'

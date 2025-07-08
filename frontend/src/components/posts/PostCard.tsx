@@ -53,6 +53,15 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onDelete, onCl
   const comments = post.comments || 0;
   const postId = post._id || post.id;
 
+  const handleCardClick = () => {
+    if (showMenu || showProfileMenu) {
+      setShowMenu(false);
+      setShowProfileMenu(false);
+    } else if (onClick) {
+      onClick();
+    }
+  };
+
   const handleLike = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!postId) {
@@ -127,7 +136,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onDelete, onCl
     <div 
       ref={cardRef}
       className={`bg-white/90 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-sm border border-gray-100/50 hover:shadow-xl transition-all duration-300 cursor-pointer group h-fit relative ${showMenu || showProfileMenu ? 'z-20' : 'z-0'}`}
-      onClick={onClick}
+      onClick={handleCardClick}
     >
       {/* Post Image */}
       <div className="relative overflow-hidden rounded-t-xl sm:rounded-t-2xl">

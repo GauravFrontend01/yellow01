@@ -278,28 +278,31 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
           <X className="w-5 h-5" />
         </button>
 
-        {/* Previous Button */}
-        {hasPrevious && onPrevious && (
-          <button
-            onClick={onPrevious}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 w-10 h-10 bg-black/20 hover:bg-black/40 text-white rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-sm"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-        )}
-
-        {/* Next Button */}
-        {hasNext && onNext && (
-          <button
-            onClick={onNext}
-            className="absolute right-16 top-1/2 transform -translate-y-1/2 z-10 w-10 h-10 bg-black/20 hover:bg-black/40 text-white rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-sm"
-          >
-            <ArrowRight className="w-5 h-5" />
-          </button>
-        )}
-
         {/* Media Section */}
-        <div className="flex-1 bg-black relative min-h-0">
+        <div className="flex-1 bg-black relative min-h-0 group">
+          {/* Navigation Arrows */}
+          <div className="absolute inset-0 flex items-center justify-between px-4 z-10">
+            {hasPrevious && onPrevious && (
+              <button
+                onClick={onPrevious}
+                className="w-10 h-10 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-sm opacity-0 group-hover:opacity-100"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+            )}
+            {/* Empty div for spacing */}
+            {!hasPrevious && <div />} 
+            
+            {hasNext && onNext && (
+              <button
+                onClick={onNext}
+                className="w-10 h-10 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-sm opacity-0 group-hover:opacity-100"
+              >
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+          
           <div className="absolute inset-0 flex items-center justify-center">
             {post.mediaType === 'video' ? (
               <video

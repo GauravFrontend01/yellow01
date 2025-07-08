@@ -10,6 +10,7 @@ import { tweetService } from '../../services/tweetService';
 import { Post } from '../../types';
 import { EditPostModal } from '../modals/EditPostModal';
 import { ConfirmDeleteModal } from '../modals/ConfirmDeleteModal';
+import EditProfileModal from '../modals/EditProfileModal';
 
 interface UserProfile {
   _id: string;
@@ -42,6 +43,7 @@ export const ProfilePage: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [deletingPost, setDeletingPost] = useState<Post | null>(null);
@@ -191,6 +193,16 @@ export const ProfilePage: React.FC = () => {
     navigate(`/dashboard?tag=${encodeURIComponent(tag)}`);
   };
 
+  const handleProfileUpdate = (updatedUser: Partial<UserProfile>) => {
+    setProfile(prevProfile => {
+      if (!prevProfile) return null;
+      return {
+        ...prevProfile,
+        ...updatedUser,
+      };
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto p-6">
@@ -227,6 +239,9 @@ export const ProfilePage: React.FC = () => {
       </div>
     );
   }
+
+  const { relationshipStatus: relStatus, followerCount, followingCount } = profile;
+  const { isOwnProfile } = relStatus || {};
 
   const totalViews = userPosts.reduce((sum, post) => sum + (post.views || 0), 0);
   const totalLikes = userPosts.reduce((sum, post) => sum + (post.likes || 0), 0);
@@ -285,10 +300,13 @@ export const ProfilePage: React.FC = () => {
               </div>
               
               <div className="flex items-center space-x-3">
-                {profile.relationshipStatus.isOwnProfile ? (
-                  <button className="flex items-center space-x-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+                {isOwnProfile ? (
+                  <button 
+                    onClick={() => setIsEditProfileOpen(true)}
+                    className="flex items-center space-x-2 px-4 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition-colors"
+                  >
                     <Edit className="w-4 h-4" />
-                    <span className="font-medium">Edit Profile</span>
+                    <span>Edit Profile</span>
                   </button>
                 ) : (
                   <>
@@ -435,6 +453,15 @@ export const ProfilePage: React.FC = () => {
         message="Are you sure you want to permanently delete this post? This action cannot be undone."
         isDeleting={isSubmittingDelete}
       />
+
+      {profile && isOwnProfile && (
+        <EditProfileModal
+            isOpen={isEditProfileOpen}
+            onClose={() => setIsEditProfileOpen(false)}
+            user={profile}
+            onProfileUpdate={handleProfileUpdate}
+        />
+      )}
     </div>
   );
 };
