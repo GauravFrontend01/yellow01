@@ -6,8 +6,8 @@ import { loginSuccess } from '../../features/auth/authSlice';
 import { userService } from '../../services/userService';
 
 export const Login: React.FC = () => {
-  const [emailOrUsername, setEmailOrUsername] = useState('test12');
-  const [password, setPassword] = useState('test1tes');
+  const [emailOrUsername, setEmailOrUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
